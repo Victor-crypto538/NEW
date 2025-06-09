@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Loan Records System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+        .container {
+            max-width: 1200px; /* Increased max-width for better display */
+            margin: 20px auto;
+            padding: 25px;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-radius: 10px;
+        }
+        form {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Three columns for better layout */
+            gap: 15px;
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            background-color: #fdfdfd;
+        }
+        form label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        form input[type="text"],
+        form input[type="number"],
+        form input[type="date"],
+        form select,
+        form textarea {
+            width: calc(100% - 20px); /* Adjust for padding */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box; /* Include padding in width */
+        }
+        form textarea {
+            grid-column: 1 / -1; /* Make textarea span full width */
+            resize: vertical;
+            min-height: 60px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-buttons {
+            grid-column: 1 / -1; /* Make buttons span full width */
+            text-align: right;
+            padding-top: 10px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #clearDataBtn {
+            background-color: #dc3545;
+            margin-left: 10px;
+        }
+        #clearDataBtn:hover {
+            background-color: #c82333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        th, td {
+            border: 1px solid #e0e0e0;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        tr:nth-child(even) {
+            background-color: #f8f8f8;
+        }
+        tr:hover {
+            background-color: #e9f5ff;
+        }
+        tfoot {
+            font-weight: bold;
+            background-color: #e0e0e0;
+        }
+        tfoot td {
+            padding: 12px 15px;
+            border-top: 2px solid #ccc;
+        }
+        #noRecordsMessage {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Loan Records System</h1>
+
+        <h2>Add New Loan</h2>
+        <form id="loanForm">
+            <div class="form-group">
+                <label for="dateLoaned">Date Loaned:</label>
+                <input type="date" id="dateLoaned" required>
+            </div>
+
+            <div class="form-group">
+                <label for="borrowerName">Borrower Name:</label>
+                <input type="text" id="borrowerName" placeholder="e.g., John Doe" required>
+            </div>
+
+            <div class="form-group">
+                <label for="amountLoaned">Amount Loaned (KSh):</label>
+                <input type="number" id="amountLoaned" step="0.01" min="0" placeholder="e.g., 5000" required>
+            </div>
+
+            <div class="form-group">
+                <label for="interestRate">Interest Rate (%):</label>
+                <input type="number" id="interestRate" step="0.01" min="0" value="0" placeholder="e.g., 10">
+            </div>
+
+            <div class="form-group">
+                <label for="dueDate">Due Date:</label>
+                <input type="date" id="dueDate">
+            </div>
+
+            <div class="form-group">
+                <label for="amountPaid">Amount Paid (KSh):</label>
+                <input type="number" id="amountPaid" step="0.01" min="0" value="0">
+            </div>
+
+            <div class="form-group">
+                <label for="status">Status:</label>
+                <select id="status">
+                    <option value="Outstanding">Outstanding</option>
+                    <option value="Partially Paid">Partially Paid</option>
+                    <option value="Paid">Paid</option>
+                </select>
+            </div>
+
+            <div class="form-group" style="grid-column: 1 / -1;">
+                <label for="notes">Notes:</label>
+                <textarea id="notes" rows="3" placeholder="Any relevant notes"></textarea>
+            </div>
+
+            <div class="form-buttons">
+                <button type="submit">Add Loan Record</button>
+                <button type="button" id="clearDataBtn">Clear All Records</button>
+            </div>
+        </form>
+
+        <h2>Current Loan Records</h2>
+        <p id="noRecordsMessage">No records found. Add a new loan above!</p>
+        <table id="loanTable">
+            <thead>
+                <tr>
+                    <th>Date Loaned</th>
+                    <th>Borrower Name</th>
+                    <th>Amount Loaned (KSh)</th>
+                    <th>Interest Rate (%)</th>
+                    <th>Due Date</th>
+                    <th>Amount Due (KSh)</th>
+                    <th>Amount Paid (KSh)</th>
+                    <th>Outstanding Balance (KSh)</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" style="text-align: right; border-right: none;">Total Amount Collected:</td>
+                    <td id="totalCollected" style="border-left: none;">0</td>
+                    <td colspan="2" style="text-align: right; border-right: none;">Total Remaining Amount:</td>
+                    <td id="totalRemaining" style="border-left: none;">0</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <script>
+        const loanForm = document.getElementById('loanForm');
+        const loanTableBody = document.querySelector('#loanTable tbody');
+        const noRecordsMessage = document.getElementById('noRecordsMessage');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+        const totalCollectedDisplay = document.getElementById('totalCollected');
+        const totalRemainingDisplay = document.getElementById('totalRemaining');
+
+        let loanRecords = []; // This will hold our loan objects
+
+        // Function to calculate Amount Due
+        function calculateAmountDue(amount, interestRate) {
+            const parsedAmount = parseFloat(amount);
+            const parsedInterestRate = parseFloat(interestRate);
+
+            if (isNaN(parsedAmount) || parsedAmount < 0) return 0;
+            if (isNaN(parsedInterestRate) || parsedInterestRate < 0) return parsedAmount;
+
+            const interest = parsedAmount * (parsedInterestRate / 100);
+            return (parsedAmount + interest); // Return raw number for calculations
+        }
+
+        // Function to calculate Outstanding Balance and determine status
+        function getLoanStatusAndBalance(amountDue, amountPaid) {
+            const outstanding = amountDue - amountPaid;
+            let status = '';
+
+            if (outstanding <= 0.01) { // Use a small epsilon for floating point comparison
+                status = 'Paid';
+            } else if (amountPaid > 0) {
+                status = 'Partially Paid';
+            } else {
+                status = 'Outstanding';
+            }
+            return { outstandingBalance: outstanding, status: status };
+        }
+
+
+        // Function to render records to the table
+        function renderRecords() {
+            loanTableBody.innerHTML = ''; // Clear existing rows
+            let totalAmountCollected = 0;
+            let totalRemainingAmount = 0;
+
+            if (loanRecords.length === 0) {
+                noRecordsMessage.style.display = 'block';
+                document.getElementById('loanTable').style.display = 'none';
+            } else {
+                noRecordsMessage.style.display = 'none';
+                document.getElementById('loanTable').style.display = 'table';
+                loanRecords.forEach((record, index) => {
+                    const row = loanTableBody.insertRow();
+
+                    // Calculate amount due based on current values
+                    const amountDue = calculateAmountDue(record.amountLoaned, record.interestRate);
+                    // Determine outstanding balance and status based on current values
+                    const { outstandingBalance, status } = getLoanStatusAndBalance(amountDue, record.amountPaid);
+
+
+                    row.insertCell().textContent = record.dateLoaned;
+                    row.insertCell().textContent = record.borrowerName;
+                    row.insertCell().textContent = parseFloat(record.amountLoaned).toFixed(2);
+                    row.insertCell().textContent = parseFloat(record.interestRate).toFixed(2) + '%';
+                    row.insertCell().textContent = record.dueDate;
+                    row.insertCell().textContent = amountDue.toFixed(2);
+                    row.insertCell().textContent = parseFloat(record.amountPaid).toFixed(2);
+                    row.insertCell().textContent = outstandingBalance.toFixed(2); // Display calculated outstanding
+                    row.insertCell().textContent = status; // Display calculated status
+                    row.insertCell().textContent = record.notes;
+
+                    totalAmountCollected += parseFloat(record.amountPaid);
+                    totalRemainingAmount += outstandingBalance;
+                });
+            }
+            totalCollectedDisplay.textContent = totalAmountCollected.toFixed(2);
+            totalRemainingDisplay.textContent = totalRemainingAmount.toFixed(2);
+        }
+
+        // Function to load records from localStorage
+        function loadRecords() {
+            const storedRecords = localStorage.getItem('loanRecords');
+            if (storedRecords) {
+                loanRecords = JSON.parse(storedRecords);
+            }
+            renderRecords(); // Display loaded records
+        }
+
+        // Function to save records to localStorage
+        function saveRecords() {
+            localStorage.setItem('loanRecords', JSON.stringify(loanRecords));
+        }
+
+        // Event listener for form submission
+        loanForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const amountLoanedVal = parseFloat(document.getElementById('amountLoaned').value);
+            const interestRateVal = parseFloat(document.getElementById('interestRate').value) || 0;
+            const amountPaidVal = parseFloat(document.getElementById('amountPaid').value) || 0;
+
+            const amountDueCalc = calculateAmountDue(amountLoanedVal, interestRateVal);
+            const { outstandingBalance: outstandingBalanceCalc, status: statusCalc } = getLoanStatusAndBalance(amountDueCalc, amountPaidVal);
+
+
+            const newLoan = {
+                dateLoaned: document.getElementById('dateLoaned').value,
+                borrowerName: document.getElementById('borrowerName').value,
+                amountLoaned: amountLoanedVal,
+                interestRate: interestRateVal,
+                dueDate: document.getElementById('dueDate').value,
+                amountPaid: amountPaidVal,
+                // Status and Outstanding Balance are now derived for consistency
+                // and will be updated automatically by renderRecords
+                status: statusCalc, // Use the calculated status
+                outstandingBalance: outstandingBalanceCalc, // Use the calculated outstanding balance
+                notes: document.getElementById('notes').value
+            };
+
+            loanRecords.push(newLoan);
+            saveRecords();
+            renderRecords();
+            loanForm.reset(); // Clear the form
+            document.getElementById('amountPaid').value = 0; // Reset amount paid to 0
+            document.getElementById('interestRate').value = 0; // Reset interest rate to 0
+            document.getElementById('status').value = 'Outstanding'; // Reset status to default
+        });
+
+        // Event listener for clearing all data
+        clearDataBtn.addEventListener('click', function() {
+            if (confirm("Are you sure you want to clear ALL loan records? This action cannot be undone.")) {
+                localStorage.removeItem('loanRecords'); // Remove data from localStorage
+                loanRecords = []; // Clear array
+                renderRecords(); // Update table
+                alert("All loan records have been cleared.");
+            }
+        });
+
+        // Load records when the page loads
+        document.addEventListener('DOMContentLoaded', loadRecords);
+    </script>
+</body>
+</html>
